@@ -12,6 +12,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.middleware.csrf import get_token
+from django.forms.models import model_to_dict
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
@@ -148,20 +149,30 @@ def index(request):
 
 def series(request):
     series_list = Series.objects.all()
-    return render(request, 'courses/index.html', {'series_list': series_list})
+    return render(request, 'courses/series/index.html', {'series_list': series_list})
 
 
 def series_course(request, series_id):
     """
     시리즈에 해당하는 코스 조회 (SeriesCourse model)
     """
-    series = Series.objects.get(pk=series_id)
-    tags = series.tags.all()
+    series = Series.objects.get(pk=series_id)  # series_id를 가져오면
+    tags = series.tags.all()  # series에 들어있는 태그를 모두 가져온다.
+    # 코스에는 태그의 고유값을 가져온다.
     courses = Course.objects.filter(tags__in=tags).distinct()
+
+    series_course_info_list = []
+
+    for course in courses:
+        course_info = model_to_dict(course)  # 객체 import
+        series_course_info_list.append(course_info)
 
     context = {
         'series': series,
-        'courses': courses
+        'courses': courses,
+        'tags': tags,
+        'series_course': series_course_info_list
     }
 
+    # print(context)
     return render(request, 'courses/series_course.html', context)

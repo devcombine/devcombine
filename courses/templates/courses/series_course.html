@@ -1,10 +1,9 @@
 <ul>
-    {% for course in courses %}
+
+    {% for course in series_course %}
     <li>
         {{course.title}}
-        {% comment %} {% for tag in course.tags.all %}
-            <li>{{tag.name.course}}</li>
-        {% endfor %} {% endcomment %}
+        {{course.instructor}}
     </li>
     {%endfor%}
 </ul>

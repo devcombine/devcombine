@@ -1,11 +1,11 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User
+from django.contrib.auth.models import *
 from .forms import CustomUserCreationForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Course, UserProfile
+from .models import *
 from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -13,12 +13,15 @@ from .serializers import MyTokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.middleware.csrf import get_token
 
+
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+
 
 def get_csrf_token(request):
     token = get_token(request)
     return JsonResponse({'csrf_token': token})
+
 
 @csrf_exempt
 def signup_view(request):
@@ -38,6 +41,7 @@ def signup_view(request):
     else:
         form = CustomUserCreationForm()
         return render(request, 'signup.html', {'form': form})
+
 
 @csrf_exempt
 def login_view(request):
@@ -59,6 +63,7 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
+
 @csrf_exempt
 def logout_view(request):
     logout(request)
@@ -66,14 +71,14 @@ def logout_view(request):
 
 
 def index(request):
-    return render(request, 'courses/index.html')
+    series_list = Series.objects.all()
+    return render(request, 'courses/index.html', {'series_list': series_list})
 
 
 def series(request):
-    """
-    시리즈명 조회
-    """
-    return "test"
+    series_list = Series.objects.all()
+    return render(request, 'courses/index.html', {'series_list': series_list})
+
 
 def series_detail(request, series_id):
     """
@@ -81,6 +86,7 @@ def series_detail(request, series_id):
     """
 
     return render(request, 'courses/detail.html')
+
 
 @csrf_exempt
 @api_view(['POST'])
@@ -96,6 +102,7 @@ def like_course(request, course_id):
     else:
         return JsonResponse({'error': 'Invalid request.'}, status=400)
 
+
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -109,6 +116,7 @@ def dislike_course(request, course_id):
         return JsonResponse({}, status=202)
     else:
         return JsonResponse({'error': 'Invalid request.'}, status=400)
+
 
 @csrf_exempt
 @api_view(['POST'])
@@ -127,6 +135,8 @@ def check_course_like(request, course_id):
         return JsonResponse({'error': 'Invalid request.'}, status=400)
 
 # todo 작동 안함
+
+
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])

@@ -29,7 +29,8 @@ class SeriesTag(models.Model):
 class Course(models.Model):
     # Course
     title = models.CharField(max_length=300)
-    tags = models.ManyToManyField(Tag)
+    # tag를 등록하는 객체
+    tags = models.ManyToManyField(Tag, through='CourseTag')
 
     def __str__(self):
         return self.title

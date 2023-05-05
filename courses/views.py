@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import *
 from .forms import CustomUserCreationForm
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, logout
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -68,24 +68,6 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return JsonResponse({'message': '로그아웃이 성공적으로 완료되었습니다.'})
-
-
-def index(request):
-    series_list = Series.objects.all()
-    return render(request, 'courses/index.html', {'series_list': series_list})
-
-
-def series(request):
-    series_list = Series.objects.all()
-    return render(request, 'courses/index.html', {'series_list': series_list})
-
-
-def series_detail(request, series_id):
-    """
-    시리즈에 해당하는 코스 조회 (SeriesCourse model)
-    """
-
-    return render(request, 'courses/detail.html')
 
 
 @csrf_exempt
@@ -157,3 +139,29 @@ def user_wishlist(request):
         return JsonResponse(wishlist, safe=False)
     else:
         return JsonResponse({'error': 'Invalid request.'}, status=400)
+
+
+def index(request):
+    series_list = Series.objects.all()
+    return render(request, 'courses/index.html', {'series_list': series_list})
+
+
+def series(request):
+    series_list = Series.objects.all()
+    return render(request, 'courses/index.html', {'series_list': series_list})
+
+
+def series_course(request, series_id):
+    """
+    시리즈에 해당하는 코스 조회 (SeriesCourse model)
+    """
+    series = Series.objects.get(pk=series_id)
+    tags = series.tags.all()
+    courses = Course.objects.filter(tags__in=tags).distinct()
+
+    context = {
+        'series': series,
+        'courses': courses
+    }
+
+    return render(request, 'courses/series_course.html', context)

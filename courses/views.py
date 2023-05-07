@@ -12,12 +12,12 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .tag_mapping import tag_mapping
+from django.db.models import Count
 
 def total_course(request):
     """
     전체 코스 조회, 필터링 기능
     """
-    course_page = request.GET.get('course_page', 1)
     tag_page = request.GET.get('tag_page', 1)
     tag_query = request.GET.get('tag_query', '')
 
@@ -30,8 +30,20 @@ def total_course(request):
         all_tags = Tag.objects.all().order_by('name')
 
     courses = Course.objects.filter(tags__in=selected_tags).distinct() if selected_tags else Course.objects.all()
+
+    sort_by = request.GET.get('sort_by', 'title')
+
+    if sort_by == 'likes':
+        courses = courses.annotate(likes_count=Count('likes')).order_by('-likes_count')
+    elif sort_by == 'rating':
+        courses = courses.order_by('-rating')
+    elif sort_by == 'enrollment_count':
+        courses = courses.order_by('-enrollment_count')
+
     courses_paginator = Paginator(courses, 10)
     tags_paginator = Paginator(all_tags, 10)
+
+    course_page = request.GET.get('course_page', 1)
 
     try:
         courses = courses_paginator.page(course_page)

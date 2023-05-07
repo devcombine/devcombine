@@ -3,6 +3,11 @@
 {% block content %}
 {% if courses %}
     <h1>전체 강의</h1>
+     <div>
+            <a href="?sort_by=likes{% if selected_tags %}&tags={{ selected_tags|join:',' }}{% endif %}">좋아요 순 정렬</a>
+            <a href="?sort_by=rating{% if selected_tags %}&tags={{ selected_tags|join:',' }}{% endif %}">평점 순 정렬</a>
+            <a href="?sort_by=enrollment_count{% if selected_tags %}&tags={{ selected_tags|join:',' }}{% endif %}">등록 수 순 정렬</a>
+        </div>
     <ul>
         {% for course in courses %}
             <li>

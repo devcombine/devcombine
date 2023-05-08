@@ -29,6 +29,7 @@ class SeriesListView(ListView):
         return main_series
 
 
+
 class SereisCourseListView(ListView):
     """
     SeriesCourseListView : 태그값으로 필터링 된 View
@@ -65,22 +66,9 @@ class SereisCourseListView(ListView):
         return render(request, 'series/series_course.html', context)
 
 
-# class SeriesListView(ListView):
-#     """
-#     SeriesListView
-#     - 전체 시리즈
-#     """
-#     model = Series
-#     template_name = 'series/index.html'
-#     context_object_name = 'main_seiries'
-#     def get(self, request):
-#         """
-#         메인에 노출 시키는 시리즈의 목록만 가져오는 함수
-#         - Admin에서 Sries를 지정할 때 is_main = True 로 노출 시킨 값만 필터링 한다.
-#         """
-#         main_series = Series.objects.filter(is_main=True).order_by(Random())[
-#             :3]        # main화면에 3개만 Random
-
-#         return render(request, 'series/index.html', {'main_series': main_series})
-
-#     # /series/list/ 라고 치면 Total series가 나와야 함
+def total_series_list(request) :
+    """
+    전체 등록된 Series 보여주는 View
+    """
+    total_series_list = Series.objects.all()
+    return render(request, 'series/list.html', {'total_series_list' : total_series_list})

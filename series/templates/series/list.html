@@ -1,0 +1,71 @@
+    {% extends 'base_index.html' %}
+    {% load static %}
+    {% block content %}
+    <div class="container-fluid py-4">
+        <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+            <div class="card-header pb-0">
+                <h6>Series 목록</h6>
+            </div>
+            <div class="card-body px-0 pt-0 pb-2">
+                <div class="table-responsive p-0">
+                <table class="table align-items-center mb-0">
+                    <thead>
+                    <tr>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">number</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Title</th>
+                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Tags</th>
+                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">main</th>
+                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Created date</th>
+                        <th class="text-secondary opacity-7"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for series in total_series_list %}
+                        <tr>
+                            <td>
+                            <div class="d-flex px-2 py-1">
+                                {{series.id}}
+                            </div>
+                        </td>
+
+                        <td>
+                        <div class="d-flex px-2 py-1">
+                            <div class="d-flex flex-column justify-content-center">
+                                <h3 class="mb-0 text-sm">
+                                    <a href = "{% url 'series:series_course' series.id %}">
+                                    {{series.title}}
+                                    </a>
+                                </h3>
+                            </div>
+                        </div>
+                        </td>
+                        <td>
+                            {% for tag in series.tags.all %}
+                                <a href = "{% url 'courses:total_course' %}?tags={{tag.id}}">
+                                    <button type="button" class="btn btn-primary rounded-pill me-2 btn-sm">{{tag.name}}</button>
+                                </a>
+                            {% endfor %}
+                        </td>
+                        <td class="align-middle text-center text-sm">
+                            {% if series.is_main %}
+                                <span class="badge badge-sm bg-gradient-success">Main</span>
+                            {% else %}
+                                <span class="badge badge-sm bg-gradient-secondary">Other</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle text-center">
+                        <span class="text-secondary text-xs font-weight-bold">{{series.create_at}}</span>
+                        </td>
+                    </tr>
+                    
+                    {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

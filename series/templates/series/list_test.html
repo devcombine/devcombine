@@ -1,0 +1,10 @@
+{% extends 'base_index.html' %}
+{% load static %}
+{% block content %}
+
+
+{% for series in total_series_list %}
+    {{ series }}
+{% endfor%}
+
+{% endblock %}

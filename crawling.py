@@ -454,7 +454,8 @@ def save_dataframe(df):
             tag, _ = Tag.objects.get_or_create(name=get_newtag(tag_name.strip()))
             course.tags.add(tag)
 
-            import os
+
+import os
             
 # Python이 실행될 때 DJANGO_SETTINGS_MODULE이라는 환경 변수에 현재 프로젝트의 settings.py파일 경로를 등록한다.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")

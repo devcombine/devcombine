@@ -162,3 +162,4 @@ cython_debug/
 .DS_Store
 secrets.json
 .github/ISSUE_TEMPLATE
+result

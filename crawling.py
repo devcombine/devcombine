@@ -225,6 +225,7 @@ def programmers_crawl():
     # 2. 전체 강의 가져오기
     with webdriver.Chrome('chromedriver', chrome_options=options) as driver:
         # 파일 쓰기
+        os.makedirs('./result/', exist_ok=True)
         f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')
         cssWriter = csv.writer(f)
         cssWriter.writerow(header)

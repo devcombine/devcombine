@@ -157,9 +157,14 @@ def programmers_crawl():
     # 강의의 태그를 설정하기 위한 dict 선언
     # 강의 : [태그 리스트]
     courses = defaultdict(set)
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')               # headless
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
 
     # 1. 태그 수집하기
-    with webdriver.Chrome(service=Service(ChromeDriverManager().install())) as driver:
+    with webdriver.Chrome('chromedriver', chrome_options=options) as driver:
         driver.get("https://school.programmers.co.kr/learn")
         
         # 더보기 버튼 클릭
@@ -218,7 +223,7 @@ def programmers_crawl():
     print("태그 수집 완료")                          
 
     # 2. 전체 강의 가져오기
-    with webdriver.Chrome(service=Service(ChromeDriverManager().install())) as driver:
+    with webdriver.Chrome('chromedriver', chrome_options=options) as driver:
         # 파일 쓰기
         f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')
         cssWriter = csv.writer(f)
@@ -294,7 +299,7 @@ def programmers_crawl():
                 row_template = dict.fromkeys(header)
                 row_template['site'] = '프로그래머스'
                 row_template['title'] = title
-                row_template['instructor'] = instructor 
+                # row_template['instructor'] = instructor 
                 row_template['description'] = ''
                 row_template['url'] = url
                 row_template['price'] = price
@@ -303,7 +308,7 @@ def programmers_crawl():
                 row_template['thumbnail_url'] = thumbnail_url
                 row_template['is_package'] = False
                 row_template['is_free'] = price == 0
-                row_template['enrollment_count'] = enrollment_count
+                # row_template['enrollment_count'] = enrollment_count
 
                 # 파일에 쓰기
                 cssWriter.writerow(list(row_template.values()))
@@ -340,9 +345,14 @@ def inflearn_crawl():
     course_vat_price = []
     course_price = []
     course_is_free = []
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')               # headless
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
 
     for page in range(1, 58): 
-        with webdriver.Chrome(service=Service(ChromeDriverManager().install())) as driver:
+        with webdriver.Chrome('chromedriver', chrome_options=options) as driver:
             driver.get("https://www.inflearn.com/courses/it-programming?order=seq&page="+str(page))
 
             for element in driver.find_elements(By.CLASS_NAME, "course-data"):
@@ -401,6 +411,18 @@ def inflearn_crawl():
 
     print('------인프런 - 저장이 완료되었습니다.------') 
 
+
+import os
+            
+# Python이 실행될 때 DJANGO_SETTINGS_MODULE이라는 환경 변수에 현재 프로젝트의 settings.py파일 경로를 등록한다.
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+import django
+# 이제 장고를 가져와 장고 프로젝트를 사용할 수 있도록 환경을 만든다.
+django.setup()
+
+from courses.models import Course, Tag
+
+
 @timed_function
 def save_dataframe(df):
 
@@ -454,16 +476,6 @@ def save_dataframe(df):
             tag, _ = Tag.objects.get_or_create(name=get_newtag(tag_name.strip()))
             course.tags.add(tag)
 
-
-import os
-            
-# Python이 실행될 때 DJANGO_SETTINGS_MODULE이라는 환경 변수에 현재 프로젝트의 settings.py파일 경로를 등록한다.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
-import django
-# 이제 장고를 가져와 장고 프로젝트를 사용할 수 있도록 환경을 만든다.
-django.setup()
-
-from courses.models import Course, Tag
 
 @timed_function
 def main():

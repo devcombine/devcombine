@@ -93,7 +93,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     # mysql - local
-    'default': os.environ['REMOTE_DB']
+    # 'default': secrets['REMOTE_DB'],
+    'default': {
+    "ENGINE": "django.db.backends.mysql",
+    "NAME": "devcombine",
+    "USER": "devcombine",
+    "PASSWORD": os.environ['REMOTE_DB_PASSWORD'],
+    "HOST": "localhost",
+    "PORT": "3306",
+    "OPTIONS": { "charset": "utf8mb4" }
+    },
 }
 
 

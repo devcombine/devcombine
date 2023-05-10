@@ -347,10 +347,6 @@ def inflearn_crawl():
     course_price = []
     course_is_free = []
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless')               # headless
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--disable-gpu')
 
     for page in range(1, 58): 
         with webdriver.Chrome('chromedriver', chrome_options=options) as driver:

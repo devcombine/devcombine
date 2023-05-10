@@ -158,6 +158,7 @@ def programmers_crawl():
     # 강의 : [태그 리스트]
     courses = defaultdict(set)
     options = webdriver.ChromeOptions()
+    options.add_argument('--headless') 
 
 #     # 1. 태그 수집하기
 #     with webdriver.Chrome('chromedriver', options=options) as driver:

@@ -18,10 +18,8 @@ jobs:
     - name: Install Dependencies
       run: |
         venv/bin/pip install -r requirements.txt
-    - name: Download chromedriver
-      run: |
-        wget -q -O tmp.zip https://chromedriver.storage.googleapis.com/81.0.4044.69/chromedriver_linux64.zip
-        unzip tmp.zip && rm tmp.zip
+    - name: setup-chromedriver
+      uses: nanasess/setup-chromedriver@v2.0.0
     - name: Crawl and save to DB
       env:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}

@@ -158,10 +158,6 @@ def programmers_crawl():
     # 강의 : [태그 리스트]
     courses = defaultdict(set)
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless')               # headless
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--disable-gpu')
 
 #     # 1. 태그 수집하기
 #     with webdriver.Chrome('chromedriver', options=options) as driver:

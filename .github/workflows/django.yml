@@ -18,6 +18,8 @@ jobs:
     - name: Install Dependencies
       run: |
         venv/bin/pip install -r requirements.txt
+    - name: Setup Chromedriver
+      uses: nanasess/setup-chromedriver@v1.0.1
     - name: Crawl and save to DB
       env:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}

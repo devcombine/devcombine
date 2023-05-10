@@ -164,7 +164,7 @@ def programmers_crawl():
     options.add_argument('--disable-gpu')
 
 #     # 1. 태그 수집하기
-#     with webdriver.Chrome('chromedriver', chrome_options=options) as driver:
+#     with webdriver.Chrome('chromedriver', options=options) as driver:
 #         driver.get("https://school.programmers.co.kr/learn")
         
 #         # 더보기 버튼 클릭
@@ -223,7 +223,7 @@ def programmers_crawl():
 #     print("태그 수집 완료")                          
 
     # 2. 전체 강의 가져오기
-    with webdriver.Chrome('chromedriver', chrome_options=options) as driver:
+    with webdriver.Chrome('chromedriver', options=options) as driver:
         # 파일 쓰기
         os.makedirs('./result/', exist_ok=True)
         f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')

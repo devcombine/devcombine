@@ -20,4 +20,4 @@ jobs:
         venv/bin/pip install -r requirements.txt
     - name: Crawl and save to DB
       run: |
-        python crawling.py
+        venv/bin/python crawling.py

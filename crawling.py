@@ -480,7 +480,7 @@ def save_dataframe(df):
 @timed_function
 def main():
     # 크롤링하여 result폴더에 결과파일 저장
-    goorm_crawl()
+    #goorm_crawl()
     programmers_crawl()
     inflearn_crawl()
 

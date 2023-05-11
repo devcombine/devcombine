@@ -261,6 +261,7 @@ def programmers_crawl():
                             continue
                     except NoSuchElementException:
                         badge = None
+                    time.sleep(2)
                     course_btn = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]')
                     title = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/h3').text
 

@@ -503,7 +503,7 @@ def save_dataframe(df):
 @timed_function
 def main():
     # 크롤링하여 result폴더에 결과파일 저장
-    #goorm_crawl()
+    goorm_crawl()
     programmers_crawl(programmers_tag())
     inflearn_crawl()
 
@@ -514,14 +514,14 @@ def main():
 
     # 기존 강의 삭제
 #     Course.objects.all().delete()
-#     for file in files:
-#         # 각 파일의 헤더 행을 지정하여 파일을 읽어옵니다.
-#         df = pd.read_csv(file)  # 헤더가 없는 경우
-#         df.fillna('', inplace=True)
-#         data.append(df)
+    for file in files:
+        # 각 파일의 헤더 행을 지정하여 파일을 읽어옵니다.
+        df = pd.read_csv(file)  # 헤더가 없는 경우
+        df.fillna('', inplace=True)
+        data.append(df)
 #         save_dataframe(df)
     
-#     result = pd.concat(data)
+    result = pd.concat(data)
 
     # 통합파일 저장
     result.to_csv('./result/' + f'{now}_devcombine.csv',index=False, mode='w',encoding="utf-8-sig")

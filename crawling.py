@@ -157,71 +157,71 @@ def programmers_crawl():
     # 강의의 태그를 설정하기 위한 dict 선언
     # 강의 : [태그 리스트]
     courses = defaultdict(set)
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument("--single-process")
-    chrome_options.add_argument("--disable-dev-shm-usage")
+#     chrome_options = webdriver.ChromeOptions()
+#     chrome_options.add_argument('--headless')
+#     chrome_options.add_argument('--no-sandbox')
+#     chrome_options.add_argument("--single-process")
+#     chrome_options.add_argument("--disable-dev-shm-usage")
 
-    # 1. 태그 수집하기
-    with webdriver.Chrome('chromedriver', options=chrome_options) as driver:
-        driver.get("https://school.programmers.co.kr/learn")
+#     # 1. 태그 수집하기
+#     with webdriver.Chrome('chromedriver', options=chrome_options) as driver:
+#         driver.get("https://school.programmers.co.kr/learn")
         
-        # 더보기 버튼 클릭
-        more_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[1]/div/div/button')
-        more_btn.click()
+#         # 더보기 버튼 클릭
+#         more_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[1]/div/div/button')
+#         more_btn.click()
         
-        # 체크박스리스트 가져오기 (section1 : 언어, section2 : 난이도)
-        lang_ul = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[1]/div/div/ul')
-        level_ul = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[2]/div/div/ul')
+#         # 체크박스리스트 가져오기 (section1 : 언어, section2 : 난이도)
+#         lang_ul = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[1]/div/div/ul')
+#         level_ul = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[2]/div/div/ul')
         
-        for i, ul in enumerate([lang_ul, level_ul]):
-            ui_id = i + 1
-            checkboxes = []
-            for i in range(1, len(ul.find_elements(By.TAG_NAME, "li")) + 1):       
-                checkbox = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[{ui_id}]/div/div/ul/li[{i}]/label')
-                checkboxes.append(checkbox)
+#         for i, ul in enumerate([lang_ul, level_ul]):
+#             ui_id = i + 1
+#             checkboxes = []
+#             for i in range(1, len(ul.find_elements(By.TAG_NAME, "li")) + 1):       
+#                 checkbox = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[{ui_id}]/div/div/ul/li[{i}]/label')
+#                 checkboxes.append(checkbox)
 
-            # 하나씩 클릭하면서 가져오기
-            for checkbox in checkboxes:
+#             # 하나씩 클릭하면서 가져오기
+#             for checkbox in checkboxes:
                 
-                # 체크하기
-                checkbox.click()
-                time.sleep(1)
+#                 # 체크하기
+#                 checkbox.click()
+#                 time.sleep(1)
 
-                # 현재 체크한 항목명(tag) 가져오기
-                tag = checkbox.text.lower()
-                if ui_id == 2:
-                    tag = tag[:3].strip() # 부제목 잘라주기
+#                 # 현재 체크한 항목명(tag) 가져오기
+#                 tag = checkbox.text.lower()
+#                 if ui_id == 2:
+#                     tag = tag[:3].strip() # 부제목 잘라주기
 
-                # 페이지별로 탐색
-                while True:  
-                    time.sleep(1)
+#                 # 페이지별로 탐색
+#                 while True:  
+#                     time.sleep(1)
 
-                    # 강의 없으면 패스
-                    try:
-                        driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/div')
-                        break
-                    except NoSuchElementException:
+#                     # 강의 없으면 패스
+#                     try:
+#                         driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/div')
+#                         break
+#                     except NoSuchElementException:
                         
-                        # 강의 섹션
-                        section = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]')
-                        for si in range(1, len(section.find_elements(By.TAG_NAME, "a")) + 1):
-                            course_title = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/h3').text
-                            print(course_title)
-                            courses[course_title].add(tag)
+#                         # 강의 섹션
+#                         section = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]')
+#                         for si in range(1, len(section.find_elements(By.TAG_NAME, "a")) + 1):
+#                             course_title = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/h3').text
+#                             print(course_title)
+#                             courses[course_title].add(tag)
 
-                        # 다음 페이지 없으면 나가기
-                        next_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/div/button[3]')
-                        if not next_btn.is_enabled():
-                            break
-                        else:
-                            next_btn.click()
+#                         # 다음 페이지 없으면 나가기
+#                         next_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/div/button[3]')
+#                         if not next_btn.is_enabled():
+#                             break
+#                         else:
+#                             next_btn.click()
 
-                # 체크 없애기
-                checkbox.click()
-                time.sleep(2)      
-    print("태그 수집 완료")                          
+#                 # 체크 없애기
+#                 checkbox.click()
+#                 time.sleep(2)      
+#     print("태그 수집 완료")                          
 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--headless')
@@ -249,7 +249,7 @@ def programmers_crawl():
                 driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/div')
                 break
             except NoSuchElementException:
-                
+                time.sleep(1)
                 # 강의 섹션
                 section = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]')
                 for si in range(1, len(section.find_elements(By.TAG_NAME, "a")) + 1):

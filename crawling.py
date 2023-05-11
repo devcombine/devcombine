@@ -249,6 +249,7 @@ def programmers_crawl():
                 driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/div')
                 break
             except NoSuchElementException:
+                print(driver.current_url)
                 time.sleep(1)
                 # 강의 섹션
                 section = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]')
@@ -260,9 +261,14 @@ def programmers_crawl():
                         if badge.text == '모집 마감':
                             continue
                     except NoSuchElementException:
+                        print(driver.current_url)
                         badge = None
                     time.sleep(2)
-                    course_btn = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]')
+                    
+                    try:
+                        course_btn = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]')
+                    except NoSuchElementException:
+                        continue
                     title = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/h3').text
 
                     # 기본 강의정보 수집

@@ -234,10 +234,10 @@ def programmers_crawl():
     print("태그 수집 완료")      
     
     # 파일 쓰기
-        os.makedirs('./result/', exist_ok=True)
-        f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')
-        cssWriter = csv.writer(f)
-        cssWriter.writerow(header)
+    os.makedirs('./result/', exist_ok=True)
+    f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')
+    cssWriter = csv.writer(f)
+    cssWriter.writerow(header)
         
     # 2. 전체 강의 가져오기
     with webdriver.Chrome(service=chrome_service, options=chrome_options) as driver:

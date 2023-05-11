@@ -1,7 +1,7 @@
 name: Run Crawler
 on:
   push:
-    branches: [ "main" ] 
+    branches: [ "feat/prgrmcrawltest" ] 
 jobs:
   build:
     runs-on: ubuntu-latest

@@ -231,14 +231,17 @@ def programmers_crawl():
                 # 체크 없애기
                 checkbox.click()
                 time.sleep(2)      
-    print("태그 수집 완료")                          
-
-    # 2. 전체 강의 가져오기
-    with webdriver.Chrome(service=chrome_service, options=chrome_options) as driver:
-        # 파일 쓰기
+    print("태그 수집 완료")      
+    
+    # 파일 쓰기
+        os.makedirs('./result/', exist_ok=True)
         f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')
         cssWriter = csv.writer(f)
         cssWriter.writerow(header)
+        
+    # 2. 전체 강의 가져오기
+    with webdriver.Chrome(service=chrome_service, options=chrome_options) as driver:
+        
         
         # 프로그래머스 접속
         driver.get("https://school.programmers.co.kr/learn") 

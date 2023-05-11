@@ -167,7 +167,7 @@ def programmers_crawl():
         driver.get("https://school.programmers.co.kr/learn")
         
         # 더보기 버튼 클릭
-        more_btn = driver.find_element(By.cssSelector, '#edu-service-app-main > div > div.site-conntent > div > div > section.Learnstyle__CourseList-sc-f2nskl-11.evmVJH')
+        more_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[1]/div/div/button')
         more_btn.click()
         
         # 체크박스리스트 가져오기 (section1 : 언어, section2 : 난이도)

@@ -164,7 +164,7 @@ def programmers_crawl():
     options.add_argument('--disable-gpu')
 
     # 1. 태그 수집하기
-    with webdriver.Chrome('chromedriver', chrome_options=options) as driver:
+    with webdriver.Chrome("/usr/bin/chromedriver", options=options) as driver:
         driver.get("https://school.programmers.co.kr/learn")
         
         # 더보기 버튼 클릭
@@ -223,7 +223,7 @@ def programmers_crawl():
     print("태그 수집 완료")                          
 
     # 2. 전체 강의 가져오기
-    with webdriver.Chrome('chromedriver', chrome_options=options) as driver:
+    with webdriver.Chrome("/usr/bin/chromedriver", options=options) as driver:
         # 파일 쓰기
         f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')
         cssWriter = csv.writer(f)
@@ -352,7 +352,7 @@ def inflearn_crawl():
     options.add_argument('--disable-gpu')
 
     for page in range(1, 58): 
-        with webdriver.Chrome('chromedriver', chrome_options=options) as driver:
+        with webdriver.Chrome("/usr/bin/chromedriver", options=options) as driver:
             driver.get("https://www.inflearn.com/courses/it-programming?order=seq&page="+str(page))
 
             for element in driver.find_elements(By.CLASS_NAME, "course-data"):
@@ -480,9 +480,9 @@ def save_dataframe(df):
 @timed_function
 def main():
     # 크롤링하여 result폴더에 결과파일 저장
-    goorm_crawl()
+    #goorm_crawl()
     programmers_crawl()
-    inflearn_crawl()
+    #inflearn_crawl()
 
     # result 폴더에 있는 파일 읽으면서 데이터 저장
     path = './result/*.csv'
@@ -490,13 +490,13 @@ def main():
     files = glob.glob(path)
 
     # 기존 강의 삭제
-    Course.objects.all().delete()
+    #Course.objects.all().delete()
     for file in files:
         # 각 파일의 헤더 행을 지정하여 파일을 읽어옵니다.
         df = pd.read_csv(file)  # 헤더가 없는 경우
         df.fillna('', inplace=True)
         data.append(df)
-        save_dataframe(df)
+        #save_dataframe(df)
     
     result = pd.concat(data)
 

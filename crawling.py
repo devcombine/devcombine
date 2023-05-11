@@ -157,13 +157,11 @@ def programmers_crawl():
     # 강의의 태그를 설정하기 위한 dict 선언
     # 강의 : [태그 리스트]
     courses = defaultdict(set)
-    options = webdriver.ChromeOptions()
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage') 
-    user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36'
-    options.add_argument('user-agent={0}'.format(user_agent))
+    chrome_options.add_argument("--single-process")
+    chrome_options.add_argument("--disable-dev-shm-usage")
 
     # 1. 태그 수집하기
     with webdriver.Chrome('chromedriver', options=options) as driver:

@@ -158,7 +158,10 @@ def programmers_crawl():
     # 강의 : [태그 리스트]
     courses = defaultdict(set)
     options = webdriver.ChromeOptions()
-    options.add_argument('--headless') 
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage') 
     user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36'
     options.add_argument('user-agent={0}'.format(user_agent))
 
@@ -222,110 +225,117 @@ def programmers_crawl():
                 time.sleep(2)      
     print("태그 수집 완료")                          
 
-#     # 2. 전체 강의 가져오기
-#     with webdriver.Chrome('chromedriver', options=options) as driver:
-#         # 파일 쓰기
-#         os.makedirs('./result/', exist_ok=True)
-#         f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')
-#         cssWriter = csv.writer(f)
-#         cssWriter.writerow(header)
+    # 2. 전체 강의 가져오기
+    with webdriver.Chrome('chromedriver', options=options) as driver:
+        # 파일 쓰기
+        os.makedirs('./result/', exist_ok=True)
+        f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')
+        cssWriter = csv.writer(f)
+        cssWriter.writerow(header)
         
-#         # 프로그래머스 접속
-#         driver.get("https://school.programmers.co.kr/learn") 
+        # 프로그래머스 접속
+        driver.get("https://school.programmers.co.kr/learn") 
 
-#         # 페이지별로 탐색
-#         while True:
+        # 페이지별로 탐색
+        while True:
+            time.sleep(1)
+
+            # 강의 없으면 패스
+            try:
+                driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/div')
+                break
+            except NoSuchElementException:
+                
+            # 강의 섹션
+            section = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]')
+            for si in range(1, len(section.find_elements(By.TAG_NAME, "a")) + 1):
+                
+                # 모집 마감 제외
+                try:
+                    badge = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/div/span')
+                    if badge.text == '모집 마감':
+                        continue
+                except NoSuchElementException:
+                    badge = None
+                course_btn = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]')
+                title = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/h3').text
+
+                # 기본 강의정보 수집
+                try:
+                    price = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[2]/div[1]/strong').text
+                    price = price.replace("₩", "").replace(",", "")
+                    price = 0 if price == "무료" else int(price)
+                    is_free = price == 0
+                except NoSuchElementException:
+                    price = None
+                try:
+                    thumbnail_url = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[1]/img').get_attribute("src")
+                except NoSuchElementException:
+                    thumbnail_url = None
+                try:
+                    url = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]').get_attribute("href")
+                except NoSuchElementException:
+                    url = None
+                try:
+                    rating = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[2]/div[2]').text
+                except NoSuchElementException:
+                    rating = None
+                
+                # 상세 강의정보 수집
+                course_btn.click()
+                driver.implicitly_wait(3)
+                
+                # # 수강생 수
+                # enrollment_count = None
+                # ul = driver.find_element(By.XPATH, '//*[@id="overview-fixed-menu"]/div/ul')
+                # for li in ul.find_elements(By.TAG_NAME, "li"):
+                #     if '명' in li.text:
+                #         enrollment_count = int(li.text[:li.text.index('명')].replace(',', ''))
+                #         break
+                # # 강사
+                # try:
+                #     instructor = driver.find_element(By.CLASS_NAME, "name").text
+                # except NoSuchElementException:
+                #     instructor = None
+                
+                # if not instructor:
+                #     try:
+                #         instructor = driver.find_element(By.CLASS_NAME, "mentor-name").text
+                #     except NoSuchElementException:
+                #         instructor = None
+                
+                # 사이트 태그 추가
+                courses[title].add('프로그래머스')
+
+                row_template = dict.fromkeys(header)
+                row_template['site'] = '프로그래머스'
+                row_template['title'] = title
+                # row_template['instructor'] = instructor 
+                row_template['description'] = ''
+                row_template['url'] = url
+                row_template['price'] = price
+                row_template['tags'] = ','.join(courses[title])
+                row_template['rating'] = rating
+                row_template['thumbnail_url'] = thumbnail_url
+                row_template['is_package'] = False
+                row_template['is_free'] = price == 0
+                # row_template['enrollment_count'] = enrollment_count
+
+                # 파일에 쓰기
+                cssWriter.writerow(list(row_template.values()))
+                driver.back()
             
-#             # 강의 섹션
-#             section = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]')
-#             for si in range(1, len(section.find_elements(By.TAG_NAME, "a")) + 1):
-                
-#                 # 모집 마감 제외
-#                 try:
-#                     badge = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/div/span')
-#                     if badge.text == '모집 마감':
-#                         continue
-#                 except NoSuchElementException:
-#                     badge = None
-#                 course_btn = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]')
-#                 title = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/h3').text
-
-#                 # 기본 강의정보 수집
-#                 try:
-#                     price = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[2]/div[1]/strong').text
-#                     price = price.replace("₩", "").replace(",", "")
-#                     price = 0 if price == "무료" else int(price)
-#                     is_free = price == 0
-#                 except NoSuchElementException:
-#                     price = None
-#                 try:
-#                     thumbnail_url = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[1]/img').get_attribute("src")
-#                 except NoSuchElementException:
-#                     thumbnail_url = None
-#                 try:
-#                     url = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]').get_attribute("href")
-#                 except NoSuchElementException:
-#                     url = None
-#                 try:
-#                     rating = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[2]/div[2]').text
-#                 except NoSuchElementException:
-#                     rating = None
-                
-#                 # 상세 강의정보 수집
-#                 course_btn.click()
-#                 driver.implicitly_wait(3)
-                
-#                 # # 수강생 수
-#                 # enrollment_count = None
-#                 # ul = driver.find_element(By.XPATH, '//*[@id="overview-fixed-menu"]/div/ul')
-#                 # for li in ul.find_elements(By.TAG_NAME, "li"):
-#                 #     if '명' in li.text:
-#                 #         enrollment_count = int(li.text[:li.text.index('명')].replace(',', ''))
-#                 #         break
-#                 # # 강사
-#                 # try:
-#                 #     instructor = driver.find_element(By.CLASS_NAME, "name").text
-#                 # except NoSuchElementException:
-#                 #     instructor = None
-                
-#                 # if not instructor:
-#                 #     try:
-#                 #         instructor = driver.find_element(By.CLASS_NAME, "mentor-name").text
-#                 #     except NoSuchElementException:
-#                 #         instructor = None
-                
-#                 # 사이트 태그 추가
-#                 courses[title].add('프로그래머스')
-
-#                 row_template = dict.fromkeys(header)
-#                 row_template['site'] = '프로그래머스'
-#                 row_template['title'] = title
-#                 # row_template['instructor'] = instructor 
-#                 row_template['description'] = ''
-#                 row_template['url'] = url
-#                 row_template['price'] = price
-#                 row_template['tags'] = ','.join(courses[title])
-#                 row_template['rating'] = rating
-#                 row_template['thumbnail_url'] = thumbnail_url
-#                 row_template['is_package'] = False
-#                 row_template['is_free'] = price == 0
-#                 # row_template['enrollment_count'] = enrollment_count
-
-#                 # 파일에 쓰기
-#                 cssWriter.writerow(list(row_template.values()))
-#                 driver.back()
+            next_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/div/button[3]')
             
-#             next_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/div/button[3]')
-            
-#             # 다음 페이지 없으면 끝
-#             if not next_btn.is_enabled():
-#                 break
-#             next_btn.click()
-#             time.sleep(1)
+            # 다음 페이지 없으면 끝
+            if not next_btn.is_enabled():
+                break
+            next_btn.click()
+            time.sleep(1)
 
-#         f.close()
+        f.close()
 
-#     print('------프로그래머스 - 저장이 완료되었습니다.------')
+    print('------프로그래머스 - 저장이 완료되었습니다.------')
 
 # 인프런
 @timed_function

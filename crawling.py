@@ -231,6 +231,7 @@ def programmers_crawl(courses):
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument("--single-process")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    
     os.makedirs('./result/', exist_ok=True)
     f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')
     cssWriter = csv.writer(f)
@@ -366,8 +367,14 @@ def inflearn_crawl():
     course_is_free = []
     options = webdriver.ChromeOptions()
 
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument("--single-process")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    
     for page in range(1, 58): 
-        with webdriver.Chrome('chromedriver', chrome_options=options) as driver:
+        with webdriver.Chrome('chromedriver', options=chrome_options) as driver:
             driver.get("https://www.inflearn.com/courses/it-programming?order=seq&page="+str(page))
 
             for element in driver.find_elements(By.CLASS_NAME, "course-data"):
@@ -391,7 +398,8 @@ def inflearn_crawl():
                     course_thumbnail.append('https://file.mk.co.kr/meet/neds/2022/05/image_readtop_2022_476589_16538895495059468.jpg')            
 
     # 수집
-    for i, course in enumerate(course_data):         
+    for i, course in enumerate(course_data):
+        print(course[course_data[i].find('"course_title\":"')+16:course_data[i].find('","course_level":')])
         course_name.append(course[course_data[i].find('"course_title\":"')+16:course_data[i].find('","course_level":')])
         course_rate.append(course[course_data[i].find('"star_rate":')+12:course_data[i].find(',"review_count":')])
         cate = course[course_data[i].find('"second_category":"')+19:course_data[i].find('","skill_tag":')]

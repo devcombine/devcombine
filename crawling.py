@@ -159,6 +159,8 @@ def programmers_crawl():
     courses = defaultdict(set)
     options = webdriver.ChromeOptions()
     options.add_argument('--headless') 
+    user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36'
+    options.add_argument('user-agent={0}'.format(user_agent))
 
 #     # 1. 태그 수집하기
 #     with webdriver.Chrome('chromedriver', options=options) as driver:

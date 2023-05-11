@@ -236,7 +236,7 @@ def programmers_crawl():
         while True:
             
             # 강의 섹션
-            section = driver.find_element(By.XPATH, '/html/body/div/div/div[2]/div/div/section[2]')
+            section = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]')
             for si in range(1, len(section.find_elements(By.TAG_NAME, "a")) + 1):
                 
                 # 모집 마감 제외

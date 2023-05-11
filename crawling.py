@@ -210,6 +210,7 @@ def programmers_tag():
                 checkbox.click()
                 time.sleep(2)      
     print("태그 수집 완료")
+    driver.quit()
     return courses
 
 @timed_function
@@ -241,12 +242,12 @@ def programmers_crawl(courses):
         cssWriter.writerow(header)
         
         # 프로그래머스 접속
-        driver.get("https://school.programmers.co.kr/learn") 
+        driver.get("https://school.programmers.co.kr/learn?page=1") 
 
         # 페이지별로 탐색
         while True:
             time.sleep(10)
-
+            
             # 강의 없으면 패스
             try:
                 driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/div')

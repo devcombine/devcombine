@@ -164,7 +164,7 @@ def programmers_crawl():
     chrome_options.add_argument("--disable-dev-shm-usage")
 
     # 1. 태그 수집하기
-    with webdriver.Chrome('chromedriver', options=options) as driver:
+    with webdriver.Chrome('chromedriver', options=chrome_options) as driver:
         driver.get("https://school.programmers.co.kr/learn")
         
         # 더보기 버튼 클릭
@@ -223,8 +223,14 @@ def programmers_crawl():
                 time.sleep(2)      
     print("태그 수집 완료")                          
 
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument("--single-process")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    
     # 2. 전체 강의 가져오기
-    with webdriver.Chrome('chromedriver', options=options) as driver:
+    with webdriver.Chrome('chromedriver', options=chrome_options) as driver:
         # 파일 쓰기
         os.makedirs('./result/', exist_ok=True)
         f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')

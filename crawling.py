@@ -157,14 +157,23 @@ def programmers_crawl():
     # 강의의 태그를 설정하기 위한 dict 선언
     # 강의 : [태그 리스트]
     courses = defaultdict(set)
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')               # headless
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--disable-gpu')
+    chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+
+    chrome_options = Options()
+    options = [
+        "--headless",
+        "--disable-gpu",
+        "--window-size=1920,1200",
+        "--ignore-certificate-errors",
+        "--disable-extensions",
+        "--no-sandbox",
+        "--disable-dev-shm-usage"
+    ]
+    for option in options:
+        chrome_options.add_argument(option)
 
     # 1. 태그 수집하기
-    with webdriver.Chrome("/usr/bin/chromedriver", options=options) as driver:
+    with webdriver.Chrome(service=chrome_service, options=chrome_options) as driver:
         driver.get("https://school.programmers.co.kr/learn")
         
         # 더보기 버튼 클릭
@@ -223,7 +232,7 @@ def programmers_crawl():
     print("태그 수집 완료")                          
 
     # 2. 전체 강의 가져오기
-    with webdriver.Chrome("/usr/bin/chromedriver", options=options) as driver:
+    with webdriver.Chrome(service=chrome_service, options=chrome_options) as driver:
         # 파일 쓰기
         f = open('./result/' + f'{now}_programmers.csv', 'w', encoding='UTF-8')
         cssWriter = csv.writer(f)

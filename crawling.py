@@ -141,7 +141,79 @@ def goorm_crawl():
 
 # 프로그래머스
 @timed_function
-def programmers_crawl():
+def programmers_tag():
+    # 강의의 태그를 설정하기 위한 dict 선언
+    # 강의 : [태그 리스트]
+    courses = defaultdict(set)
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument("--single-process")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+
+    # 1. 태그 수집하기
+    with webdriver.Chrome('chromedriver', options=chrome_options) as driver:
+        driver.get("https://school.programmers.co.kr/learn")
+        
+        # 더보기 버튼 클릭
+        more_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[1]/div/div/button')
+        more_btn.click()
+        
+        # 체크박스리스트 가져오기 (section1 : 언어, section2 : 난이도)
+        lang_ul = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[1]/div/div/ul')
+        level_ul = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[2]/div/div/ul')
+        
+        for i, ul in enumerate([lang_ul, level_ul]):
+            ui_id = i + 1
+            checkboxes = []
+            for i in range(1, len(ul.find_elements(By.TAG_NAME, "li")) + 1):       
+                checkbox = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[{ui_id}]/div/div/ul/li[{i}]/label')
+                checkboxes.append(checkbox)
+
+            # 하나씩 클릭하면서 가져오기
+            for checkbox in checkboxes:
+                
+                # 체크하기
+                checkbox.click()
+                time.sleep(1)
+
+                # 현재 체크한 항목명(tag) 가져오기
+                tag = checkbox.text.lower()
+                if ui_id == 2:
+                    tag = tag[:3].strip() # 부제목 잘라주기
+
+                # 페이지별로 탐색
+                while True:  
+                    time.sleep(1)
+
+                    # 강의 없으면 패스
+                    try:
+                        driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/div')
+                        break
+                    except NoSuchElementException:
+                        
+                        # 강의 섹션
+                        section = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]')
+                        for si in range(1, len(section.find_elements(By.TAG_NAME, "a")) + 1):
+                            course_title = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/h3').text
+                            print(course_title)
+                            courses[course_title].add(tag)
+
+                        # 다음 페이지 없으면 나가기
+                        next_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/div/button[3]')
+                        if not next_btn.is_enabled():
+                            break
+                        else:
+                            next_btn.click()
+
+                # 체크 없애기
+                checkbox.click()
+                time.sleep(2)      
+    print("태그 수집 완료")
+    return courses
+
+@timed_function
+def programmers_crawl(courses):
     '''
     # 프로그래머스 크롤링
     ***
@@ -152,76 +224,7 @@ def programmers_crawl():
         - Python 체크박스 클릭, Python 강의의 tags에 Python 추가
     2. 전체 강의의 데이터 수집 : 전체항목 페이지에서 페이지를 넘겨가며 항목의 상세 데이터를 가져온다.
 
-    '''
-
-    # 강의의 태그를 설정하기 위한 dict 선언
-    # 강의 : [태그 리스트]
-    courses = defaultdict(set)
-#     chrome_options = webdriver.ChromeOptions()
-#     chrome_options.add_argument('--headless')
-#     chrome_options.add_argument('--no-sandbox')
-#     chrome_options.add_argument("--single-process")
-#     chrome_options.add_argument("--disable-dev-shm-usage")
-
-#     # 1. 태그 수집하기
-#     with webdriver.Chrome('chromedriver', options=chrome_options) as driver:
-#         driver.get("https://school.programmers.co.kr/learn")
-        
-#         # 더보기 버튼 클릭
-#         more_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[1]/div/div/button')
-#         more_btn.click()
-        
-#         # 체크박스리스트 가져오기 (section1 : 언어, section2 : 난이도)
-#         lang_ul = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[1]/div/div/ul')
-#         level_ul = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[2]/div/div/ul')
-        
-#         for i, ul in enumerate([lang_ul, level_ul]):
-#             ui_id = i + 1
-#             checkboxes = []
-#             for i in range(1, len(ul.find_elements(By.TAG_NAME, "li")) + 1):       
-#                 checkbox = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[1]/div/div[2]/div[{ui_id}]/div/div/ul/li[{i}]/label')
-#                 checkboxes.append(checkbox)
-
-#             # 하나씩 클릭하면서 가져오기
-#             for checkbox in checkboxes:
-                
-#                 # 체크하기
-#                 checkbox.click()
-#                 time.sleep(1)
-
-#                 # 현재 체크한 항목명(tag) 가져오기
-#                 tag = checkbox.text.lower()
-#                 if ui_id == 2:
-#                     tag = tag[:3].strip() # 부제목 잘라주기
-
-#                 # 페이지별로 탐색
-#                 while True:  
-#                     time.sleep(1)
-
-#                     # 강의 없으면 패스
-#                     try:
-#                         driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/div')
-#                         break
-#                     except NoSuchElementException:
-                        
-#                         # 강의 섹션
-#                         section = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]')
-#                         for si in range(1, len(section.find_elements(By.TAG_NAME, "a")) + 1):
-#                             course_title = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/h3').text
-#                             print(course_title)
-#                             courses[course_title].add(tag)
-
-#                         # 다음 페이지 없으면 나가기
-#                         next_btn = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/div/button[3]')
-#                         if not next_btn.is_enabled():
-#                             break
-#                         else:
-#                             next_btn.click()
-
-#                 # 체크 없애기
-#                 checkbox.click()
-#                 time.sleep(2)      
-#     print("태그 수집 완료")                          
+    '''               
 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--headless')
@@ -242,15 +245,16 @@ def programmers_crawl():
 
         # 페이지별로 탐색
         while True:
-            time.sleep(1)
+            time.sleep(10)
 
             # 강의 없으면 패스
             try:
                 driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/div')
                 break
             except NoSuchElementException:
-                print(driver.current_url)
-                time.sleep(1)
+                print(f'{driver.current_url} 강의 없음')
+                time.sleep(10)
+                
                 # 강의 섹션
                 section = driver.find_element(By.XPATH, '//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]')
                 for si in range(1, len(section.find_elements(By.TAG_NAME, "a")) + 1):
@@ -261,13 +265,14 @@ def programmers_crawl():
                         if badge.text == '모집 마감':
                             continue
                     except NoSuchElementException:
-                        print(driver.current_url)
+                        print(f'{driver.current_url} 모집마감 제외')
                         badge = None
                     time.sleep(2)
                     
                     try:
                         course_btn = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]')
                     except NoSuchElementException:
+                        print(f'{driver.current_url} 섹션 못찾음')
                         continue
                     title = driver.find_element(By.XPATH, f'//*[@id="edu-service-app-main"]/div/div[2]/div/div/section[2]/a[{si}]/div[2]/div[1]/h3').text
 
@@ -324,6 +329,7 @@ def programmers_crawl():
         f.close()   
 
     print('------프로그래머스 - 저장이 완료되었습니다.------')
+    
 
 # 인프런
 @timed_function
@@ -476,7 +482,7 @@ def save_dataframe(df):
 def main():
     # 크롤링하여 result폴더에 결과파일 저장
     #goorm_crawl()
-    programmers_crawl()
+    programmers_crawl(programmers_tag())
     inflearn_crawl()
 
     # result 폴더에 있는 파일 읽으면서 데이터 저장

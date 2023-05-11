@@ -12,6 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from account.models import UserProfile
 from .serializers import MyTokenObtainPairSerializer
 from .forms import CustomUserCreationForm
+from .forms import CustomAuthenticationForm
 
 # Create your views here.
 
@@ -46,7 +47,7 @@ def signup_view(request):
 @csrf_exempt
 def login_view(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
+        form = CustomAuthenticationForm(request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
@@ -56,7 +57,7 @@ def login_view(request):
         else:
             return JsonResponse({'error': 'Invalid credentials.'}, status=401)
     else:
-        form = AuthenticationForm()
+        form = CustomAuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
 
